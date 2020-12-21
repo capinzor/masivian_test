@@ -1,19 +1,21 @@
 package com.masivian.test.controller;
 
+import com.masivian.test.db.MysqlBet;
 import com.masivian.test.db.MysqlRoulette;
 import com.masivian.test.dto.Bet;
-import com.masivian.test.dto.Roulette;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
+import java.util.List;
+import java.util.Map;
+
 @RestController
 public class RouletteController {
-
     private final MysqlRoulette mysqlRoulette;
+    private final MysqlBet mysqlBet;
 
-    public RouletteController(MysqlRoulette mysqlRoulette) {
+    public RouletteController(MysqlRoulette mysqlRoulette, MysqlBet mysqlBet) {
         this.mysqlRoulette = mysqlRoulette;
+        this.mysqlBet = mysqlBet;
     }
 
     @PostMapping("roulettes")
@@ -21,24 +23,23 @@ public class RouletteController {
         return mysqlRoulette.add();
     }
 
-    @PutMapping("roulettes/:id")
-    public boolean openRoulette(@PathVariable int id) {
-        return true;
+    @PutMapping("roulettes/{id}")
+    public String openRoulette(@PathVariable int id) {
+        return mysqlRoulette.open(id);
     }
 
     @PostMapping("roulettes/bets")
-    public boolean createBet(@RequestBody Bet bet, @RequestHeader int idUser) {
-        return false;
+    public String createBet(@RequestBody Bet bet, @RequestHeader("user-id") int idUser) {
+        return mysqlBet.add(bet, idUser);
     }
 
-    @PutMapping("roulettes/:id/bets")
-    public  String[] closeBets(@PathVariable int id){
-        return null;
+    @PutMapping("roulettes/{id}/bets")
+    public List<Map<String, Object>> closeBets(@PathVariable int id) {
+        return mysqlBet.close(id);
     }
 
     @GetMapping("roulettes")
-    public Roulette[] getRoulette(){
-        return null;
+    public List<Map<String, Object>> getRoulette() {
+        return mysqlRoulette.listOfRoulette();
     }
-
 }
